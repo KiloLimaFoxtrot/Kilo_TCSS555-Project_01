@@ -3,6 +3,7 @@ from __future__ import print_function
 from nltk.stem import *
 from nltk.stem.porter import *
 from nltk.stem.snowball import SnowballStemmer
+from nltk.stem import WordNetLemmatizer 
 import nltk
 import os
 import __future__
@@ -12,15 +13,13 @@ import csv
 import pandas as pd
 import numpy as np
 import math
-
+import sys
 
 def getWords(line):
     words = []
     for w in line.split():
         words.append(w)
-    df = pd.DataFrame(data=words, columns=['word'])
-    return df
-
+    return words
 
 def printDataFrameText(words):
     wordArray = words.to_numpy().ravel()
@@ -37,38 +36,66 @@ def getStopWords():
     return stopwords
 
 def removeStopWords(words, stopWords):
-    words = words.drop(words[words['word'].isin(stopWords)].index)
-    return words
+    somelist = [x for x in words if not IsStopWord(x,stopWords)]
+    return somelist
 
 def stemmSnowballWords(words):
     stemmer = SnowballStemmer("english")
-    for index, row in words.iterrows():
-        if index < len(words.index):
-            stemmedWord = stemmer.stem(row['word'])
-            words.iat[index,0] = stemmedWord
+    i = 0
+    for x in words: 
+        stemmedWord = stemmer.stem(x)
+        words[i] = stemmedWord
+        i = i + 1
     return words
 
 def stemmPorterWords(words):
     stemmer = PorterStemmer()
-    for index, row in words.iterrows():
-        if index < len(words.index):
-            stemmedWord = stemmer.stem(row['word'])
-            words.iat[index,0] = stemmedWord
+    i = 0
+    for x in words: 
+        stemmedWord = stemmer.stem(x)
+        words[i] = stemmedWord
+        i = i + 1
     return words
 
-def removeSpecialCharacterWords(words):
-    symbols = ['`','~','!','@','#','$','%','^','&','*','(',')','_','-','+','=','{','[','}','}','|','\\',':',';','"','\'','<',',','>','.','?','/','""',' ','']
-    words = words.drop(words[words['word'].isin(symbols)].index)
+
+def lemmatizeWords(words):
+    lemmatizer = WordNetLemmatizer()
+    i = 0
+    for x in words:           
+        lemmizedWord = lemmatizer.lemmatize(x)
+        words[i] = lemmizedWord
+        i = i + 1
     return words
+
+
+def removeSpecialCharacterWords(words):
+    somelist = [x for x in words if not IsSpecialCharacterWord(x)]
+    return somelist
+
+def IsSpecialCharacterWord(word):
+    symbols = ['`','~','!','@','#','$','%','^','&','*','(',')','_','-','+','=','{','[','}','}','|','\\',':',';','"','\'','<',',','>','.','?','/','""',' ','']
+    for x in symbols:
+        if word == x:
+            return True
+    return False
+
+def IsStopWord(word, stopWords):
+    for x in stopWords:
+        if word == x:
+            return True
+    return False
+
 
 def stripWords(words):
     symbols = ['`','~','!','@','#','$','%','^','&','*','(',')','_','-','+','=','{','[','}','}','|','\\',':',';','"','\'','<',',','>','.','?','/','"',' ','']
-    for index, row in words.iterrows():       
-        newWord = str.strip(row['word'])
+    i = 0
+    for x in words:       
+        newWord = str.strip(x)
         newWord = str.strip(newWord, "`~!@#$%^&*()_-+={[}}|\\:;\"<,>.?/ ")
         newWord = re.sub('[^A-Za-z0-9]+', '', newWord)
         newWord = newWord.lower()
-        words.iat[index,0] = newWord
+        words[i] = newWord
+        i = i + 1
     return words
 
  
@@ -77,21 +104,29 @@ stopWords = getStopWords()
 #set path for indexed decptive words
 df = pd.read_csv('C:\\Users\\cressm\\Desktop\\TCSS 555\\deceptive-opinion_indexed.csv')  
 
-data = []
+lemmantizedData = []
+stemmedData = []
 for index, row in df.iterrows(): 
     words = getWords(row['text'])
     words = stripWords(words)
     words = removeSpecialCharacterWords(words)
     words = removeStopWords(words, stopWords)
-    words = stemmSnowballWords(words)
-    wordArray = words.to_numpy().ravel()
-    newReview = " ".join(wordArray)
-    d = {'id': row['id'], 'deceptive': row['deceptive'], 'hotel':row['hotel'], 'polarity':row['polarity'], 'source':row['source'], 'text':newReview }
-    data.append(d)
+    wordsToLemmative = words
+    wordsToStem = words
+    lemmatizedWords = lemmatizeWords(wordsToLemmative)
+    #stemmedWords = stemmSnowballWords(wordsToStem)
+    newlemmatizedReview = " ".join(lemmatizedWords)
+    #newStemmedReview = " ".join(stemmedWords)
+    #d = {'id': row['id'], 'deceptive': row['deceptive'], 'hotel':row['hotel'], 'polarity':row['polarity'], 'source':row['source'], 'text':newStemmedReview }
+    d2 = {'id': row['id'], 'deceptive': row['deceptive'], 'hotel':row['hotel'], 'polarity':row['polarity'], 'source':row['source'], 'text':newlemmatizedReview }
+    #stemmedData.append(d)
+    lemmantizedData.append(d2)
 
-dfProcessed = pd.DataFrame(data=data, columns=['id','deceptive','hotel','polarity','source','text'])
+#dfProcessed = pd.DataFrame(data=stemmedData, columns=['id','deceptive','hotel','polarity','source','text'])
+dfProcessedLemmatized = pd.DataFrame(data=lemmantizedData, columns=['id','deceptive','hotel','polarity','source','text'])
 #set path for output file
-dfProcessed.to_csv('C:\\Users\\cressm\\Desktop\\TCSS 555\\deceptive-opinion_processed.csv',index=False)
+#dfProcessed.to_csv('C:\\Users\\cressm\\Desktop\\TCSS 555\\deceptive-opinion_processedstemmed.csv',index=False)
+dfProcessedLemmatized.to_csv('C:\\Users\\cressm\\Desktop\\TCSS 555\\deceptive-opinion_processedlemmatized.csv',index=False)
 
 
 
