@@ -34,7 +34,7 @@ Y = array1[:, 5]
 # feature extraction
 model = LogisticRegression(solver='LRSolver')
 rfe1 = RFE(model, 3) # not sure about 3
-
+`
 ### Fitting the data has been the holdup.
 # returns the ValueError: could not convert string to float: 'id'
 dataFit1 = rfe1.fit(X, Y)
