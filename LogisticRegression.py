@@ -38,15 +38,12 @@ hotelEncoded_Test = label_encoder.fit_transform(Test_X['hotel'])
 polarityEncoded_Test = label_encoder.fit_transform(Test_X['polarity'])
 sourceEncoded_Test = label_encoder.fit_transform(Test_X['source'])
 
-
 onehot_encoder = OneHotEncoder(sparse=False)
 hotelEncoded_Train = hotelEncoded_Train.reshape(len(hotelEncoded_Train), 1)
 Train_X['hotel'] = onehot_encoder.fit_transform(hotelEncoded_Train)
-HotelArray_Train = onehot_encoder.fit_transform(hotelEncoded_Train)
 
 polarityEncoded_Train = polarityEncoded_Train.reshape(len(polarityEncoded_Train), 1)
 Train_X['polarity'] = onehot_encoder.fit_transform(polarityEncoded_Train)
-#PolarityArray_Train = onehot_encoder.fit_transform(PolarityArray_Train)
 
 sourceEncoded_Train = sourceEncoded_Train.reshape(len(sourceEncoded_Train), 1)
 Train_X['source'] = onehot_encoder.fit_transform(sourceEncoded_Train)
@@ -56,7 +53,6 @@ Test_X['hotel'] = onehot_encoder.fit_transform(hotelEncoded_Test)
 HotelArray_Test= onehot_encoder.fit_transform(hotelEncoded_Test)
 
 polarityEncoded_Test = polarityEncoded_Test.reshape(len(polarityEncoded_Test), 1)
-#PolarityArray_Test = onehot_encoder.fit_transform(polarityEncoded_Test)
 Test_X['polarity'] = onehot_encoder.fit_transform(polarityEncoded_Test)
 
 sourceEncoded_Test = sourceEncoded_Test.reshape(len(sourceEncoded_Test), 1)
@@ -68,16 +64,13 @@ Train_X_Tfidf = Tfidf_vect.transform(Train_X['text'])
 Test_X_Tfidf = Tfidf_vect.transform(Test_X['text'])
 Train_X['text'] = Train_X_Tfidf.toarray()
 Test_X['text'] = Test_X_Tfidf.toarray()
-TrainX_Array = Train_X_Tfidf.toarray()
-TestX_Array = Test_X_Tfidf.toarray()
 
-
-model = LogisticRegression(C=1.0).fit(HotelArray_Train , Train_Y)
-score = model.score(HotelArray_Test, Test_Y)
+model = LogisticRegression(C=1.0).fit(Train_X , Train_Y)
+score = model.score(Test_X, Test_Y)
 print('features', score)
 
 np.array([Test_X.columns[1:-1]]).T
-feature_importance=pd.DataFrame(np.hstack((np.array([Train_X['hotel'].columns]).T, model.coef_.T)), columns=['feature', 'importance'])
+feature_importance=pd.DataFrame(np.hstack((np.array([Train_X.columns]).T, model.coef_.T)), columns=['feature', 'importance'])
 feature_importance['importance'] = pd.to_numeric(feature_importance['importance'])
 feature_importance = feature_importance.sort_values(by='importance', ascending=False)
 print(feature_importance)
