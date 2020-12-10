@@ -43,7 +43,7 @@ def IsSpecialCharacterToken(word):
 
 def checkWords(wordArray):
     english_vocab = set(w.lower() for w in nltk.corpus.words.words())
-    for x in wordArray: 
+    for x in wordArray:
         if x not in english_vocab:
             print(x)
     return words
@@ -58,7 +58,6 @@ def stripWords(words):
         words[i] = newWord
         i = i + 1
     return words
-
 
 def getWords(line):
     words = []
