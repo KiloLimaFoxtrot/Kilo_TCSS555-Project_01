@@ -6,6 +6,8 @@
 # 3. https://towardsdatascience.com/machine-learning-simple-linear
 # -regression-with-python-f04ecfdadc13
 
+# **** THIS CLASS IS NOT FUNCTIONAL
+
 import pandas as pd
 from numpy import set_printoptions
 from pandas import read_csv
@@ -19,7 +21,7 @@ import TCSS555PreProcessing as lib
 
 output_path = 'C:\\Users\\cressm\\Desktop\\TCSS 555\\deceptive-opinion.csv'
 
-df = pd.read_csv('deceptive-opinion.csv')
+df = pd.read_csv('../deceptive-opinion.csv')
 lib.processTextWithLemmanization(df,
                                  output_path +
                                  'deceptive-opinion_test1.csv')
