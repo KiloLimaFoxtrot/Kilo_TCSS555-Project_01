@@ -15,11 +15,17 @@ from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import f_classif
 from sklearn.feature_selection import RFE
 from sklearn.linear_model import LogisticRegression
-import TCSS555PreProcessing as lib
+
+# For use in main directory
+# import TCSS555PreProcessing as lib
+
+# For use in this Draft Work directory
+import TCSS555PreProcessing_copy01 as lib
 
 # import networkx.drawing.tests.test_pylab
 
-output_path = 'C:\\Users\\cressm\\Desktop\\TCSS 555\\deceptive-opinion.csv'
+output_path = 'C:\\Users\\cressm\\Desktop\\TCSS ' \
+              '555\\deceptive-opinion.csv'
 
 df = pd.read_csv('../deceptive-opinion.csv')
 lib.processTextWithLemmanization(df,
@@ -35,7 +41,7 @@ X = array1[:, 0:5]
 Y = array1[:, 5]
 # feature extraction
 model = LogisticRegression(solver='LRSolver')
-rfe1 = RFE(model, 3) # not sure about 3
+rfe1 = RFE(model, 3)  # not sure about 3
 
 ### Fitting the data has been the holdup.
 # returns the ValueError: could not convert string to float: 'id'
